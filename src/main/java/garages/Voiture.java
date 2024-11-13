@@ -30,7 +30,9 @@ public class Voiture {
 	 */
 	public void entreAuGarage(Garage g) throws IllegalStateException {
 		// Et si la voiture est déjà dans un garage ?
-
+		if (estDansUnGarage()) {
+			throw new IllegalStateException("La voiture est déjà dans un garage.");
+		}
 		Stationnement s = new Stationnement(this, g);
 		myStationnements.add(s);
 	}
@@ -42,31 +44,43 @@ public class Voiture {
 	 * @throws IllegalStateException si la voiture n'est pas dans un garage
 	 */
 	public void sortDuGarage() throws IllegalStateException {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		if (!estDansUnGarage()) {
+			throw new IllegalStateException("La voiture n'est pas actuellement dans un garage.");
+		}
+
 		// TODO: Implémenter cette méthode
 		// Trouver le dernier stationnement de la voiture
 		// Terminer ce stationnement
+		myStationnements.get(myStationnements.size() - 1).terminer();
 	}
 
 	/**
 	 * Calcule l'ensemble des garages visités par cette voiture
-	 * 
+	 *
 	 * @return l'ensemble des garages visités par cette voiture
 	 */
 	public Set<Garage> garagesVisites() {
 		// TODO: Implémenter cette méthode
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		Set<Garage> garages = new HashSet<>();
+		for (Stationnement s : myStationnements) {
+			garages.add(s.getmyGarage());
+		}
+		return garages;
+
 	}
 
 	/**
 	 * Détermine si la voiture est actuellement dans un garage
-	 * 
+	 *
 	 * @return vrai si la voiture est dans un garage, faux sinon
 	 */
 	public boolean estDansUnGarage() {
 		// TODO: Implémenter cette méthode
-		throw new UnsupportedOperationException("Pas encore implémenté");
 		// Vrai si le dernier stationnement est en cours
+		if(!myStationnements.isEmpty() && myStationnements.get(myStationnements.size() - 1).estEnCours())
+		{return true;}
+
+		return false;
 	}
 
 	/**
@@ -74,13 +88,13 @@ public class Voiture {
 	 * dates d'entrée / sortie dans ce garage
 	 * <br>
 	 * Exemple :
-	 * 
+	 *
 	 * <pre>
 	 * Garage Castres:
-	 *		Stationnement{ entree=28/01/2019, sortie=28/01/2019 }
-	 *		Stationnement{ entree=28/01/2019, en cours }
+	 *    Stationnement{ entree=28/01/2019, sortie=28/01/2019 }
+	 *    Stationnement{ entree=28/01/2019, en cours }
 	 *  Garage Albi:
-	 *		Stationnement{ entree=28/01/2019, sortie=28/01/2019 }
+	 *    Stationnement{ entree=28/01/2019, sortie=28/01/2019 }
 	 * </pre>
 	 *
 	 * @param out l'endroit où imprimer (ex: System.out pour imprimer dans la
@@ -89,7 +103,18 @@ public class Voiture {
 	public void imprimeStationnements(PrintStream out) {
 		// TODO: Implémenter cette méthode
 		// Utiliser les méthodes toString() de Garage et Stationnement
-		throw new UnsupportedOperationException("Pas encore implémenté");
-	}
+		Map<Garage, List<Stationnement>> stationnementsParGarage = new HashMap<>();
+		for (Stationnement s : myStationnements) {
+			stationnementsParGarage
+					.computeIfAbsent(s.getmyGarage(), k -> new ArrayList<>())
+					.add(s);
+		}
 
+		for (Map.Entry<Garage, List<Stationnement>> entry : stationnementsParGarage.entrySet()) {
+			out.println("Garage " + entry.getKey().toString() + ":");
+			for (Stationnement s : entry.getValue()) {
+				out.println("\t" + s);
+			}
+		}
+	}
 }
